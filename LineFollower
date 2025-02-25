@@ -1,0 +1,78 @@
+#define IN1 18  // Right Motor
+#define IN2 19  // Right Motor
+#define IN3 21  // Left Motor
+#define IN4 22  // Left Motor
+
+#define LEFT_SENSOR 12
+#define RIGHT_SENSOR 13
+
+#define PWM_CHANNEL_LEFT  0
+#define PWM_CHANNEL_RIGHT 1
+#define PWM_FREQ 5000
+#define PWM_RESOLUTION 8
+
+#define SPEED 102  
+
+void setup() {
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+  pinMode(IN3, OUTPUT);
+  pinMode(IN4, OUTPUT);
+
+  pinMode(LEFT_SENSOR, INPUT);
+  pinMode(RIGHT_SENSOR, INPUT);
+
+  ledcSetup(PWM_CHANNEL_LEFT, PWM_FREQ, PWM_RESOLUTION);
+  ledcSetup(PWM_CHANNEL_RIGHT, PWM_FREQ, PWM_RESOLUTION);
+  ledcAttachPin(IN1, PWM_CHANNEL_RIGHT);
+  ledcAttachPin(IN2, PWM_CHANNEL_RIGHT);
+  ledcAttachPin(IN3, PWM_CHANNEL_LEFT);
+  ledcAttachPin(IN4, PWM_CHANNEL_LEFT);
+}
+
+void loop() {
+  int leftValue = digitalRead(LEFT_SENSOR);
+  int rightValue = digitalRead(RIGHT_SENSOR);
+
+  if (leftValue == HIGH && rightValue == HIGH) {
+    moveForward(); 
+  } 
+  else if (leftValue == HIGH) {
+    turnLeft();
+  } 
+  else if (rightValue == HIGH) {
+    turnRight(); 
+  } 
+  else {
+    stopMotors();  
+  }
+}
+
+void moveForward() {
+  ledcWrite(PWM_CHANNEL_RIGHT, SPEED);
+  digitalWrite(IN2, LOW);
+
+  ledcWrite(PWM_CHANNEL_LEFT, SPEED);
+  digitalWrite(IN4, LOW);
+}
+
+void turnLeft() {
+  ledcWrite(PWM_CHANNEL_RIGHT, SPEED);
+  digitalWrite(IN2, LOW);
+
+  ledcWrite(PWM_CHANNEL_LEFT, 0);
+  digitalWrite(IN4, LOW);
+}
+
+void turnRight() {
+  ledcWrite(PWM_CHANNEL_RIGHT, 0);
+  digitalWrite(IN2, LOW);
+
+  ledcWrite(PWM_CHANNEL_LEFT, SPEED);
+  digitalWrite(IN4, LOW);
+}
+
+void stopMotors() {
+  ledcWrite(PWM_CHANNEL_RIGHT, 0);
+  ledcWrite(PWM_CHANNEL_LEFT, 0);
+}
